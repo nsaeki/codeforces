@@ -20,45 +20,57 @@ func scanInt() int {
 	return v
 }
 
-func scanInts(n int) []int {
-	a := make([]int, n)
-	for i := 0; i < n; i++ {
-		a[i] = scanInt()
-	}
-	return a
-}
-
-func scanString() string {
-	if sc.Scan() {
-		return sc.Text()
-	}
-	panic(sc.Err())
-}
-
 var sc = newScanner()
 
 func main() {
-	t := scanInt()
-	for i := 0; i < t; i++ {
-		solve()
-	}
-}
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
 
-func solve() {
-	n := scanInt()
-	m := make(map[int]int)
-	res := make([]int, n)
-	max := 1
-	for i := 0; i < n; i++ {
-		f := scanInt()
-		if _, ok := m[f]; ok {
-			res[i] = m[f]
-		} else {
-			res[i] = max
-			m[f] = max
-			max++
+	for t := scanInt(); t > 0; t-- {
+		n := scanInt()
+		f := make([]int, n)
+		m := make(map[int]bool)
+		r := -1
+		for i := 0; i < n; i++ {
+			f[i] = scanInt()
+			m[f[i]] = true
+			if r == -1 && i > 0 && f[i] == f[i-1] {
+				r = i
+			}
 		}
+
+		cnt := 0
+		res := make([]int, n)
+		if len(m) == 1 {
+			cnt = 1
+			for i := 0; i < n; i++ {
+				res[i] = 1
+			}
+
+		} else if n&1 == 0 || f[0] == f[n-1] {
+			cnt = 2
+			res[0] = 1
+			for i := 1; i < n; i++ {
+				res[i] = res[i-1] ^ 3
+			}
+		} else if r > 0 {
+			cnt = 2
+			res[0] = 1
+			for i := 1; i < n; i++ {
+				res[i] = res[i-1] ^ 3
+				if i == r {
+					res[i] = res[i-1]
+				}
+			}
+		} else {
+			cnt = 3
+			res[0], res[n-1] = 1, 3
+			for i := 1; i < n-1; i++ {
+				res[i] = res[i-1] ^ 3
+			}
+		}
+
+		fmt.Println(cnt)
+		fmt.Println(strings.Trim(fmt.Sprint(res), "[]"))
 	}
-	fmt.Println(len(m))
-	fmt.Println(strings.Trim(fmt.Sprint(res), "[]"))
 }
