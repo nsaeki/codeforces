@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -19,45 +20,23 @@ func scanInt() int {
 	return v
 }
 
-func scanInts(n int) []int {
-	a := make([]int, n)
-	for i := 0; i < n; i++ {
-		a[i] = scanInt()
-	}
-	return a
-}
-
-func scanString() string {
-	if sc.Scan() {
-		return sc.Text()
-	}
-	panic(sc.Err())
-}
-
 var sc = newScanner()
 
 func main() {
-	t := scanInt()
-	mx := 100000
-	ans := make([]byte, mx)
-	for i := 0; i < mx; i++ {
-		ans[i] = 'a'
-	}
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
 
-	for i := 0; i < t; i++ {
+	for t := scanInt(); t > 0; t-- {
 		n, k := scanInt(), scanInt()
-		x := 0
-		s := 0
+		ans := bytes.Repeat([]byte{'a'}, n)
+		x, s := 0, 0
 		for s < k {
 			x++
-			s = x * (x + 1) / 2
+			s += x
 		}
-
 		l, r := x, x-(s-k)-1
 		ans[n-l-1] = 'b'
 		ans[n-r-1] = 'b'
-		fmt.Println(string(ans[:n]))
-		ans[n-l-1] = 'a'
-		ans[n-r-1] = 'a'
+		fmt.Fprintf(w, "%s\n", ans)
 	}
 }
